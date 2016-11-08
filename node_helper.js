@@ -9,6 +9,7 @@
 
 const NodeHelper = require('node_helper');
 var request = require('request');
+var moment = require('moment');
 
 module.exports = NodeHelper.create({
 
@@ -20,12 +21,16 @@ module.exports = NodeHelper.create({
 	getData: function() {
 		var self = this;
 		
+		var currentDate = moment().format('YYYY-MM-DD+hh:mm:ss');
+		var myUrl = this.config.apiBase + this.config.requestURL + '?hafasID=' + this.config.stationID + '&time=' + currentDate;
+				
 		request({
-			url: 'http://rnv.the-agent-factory.de:8080/easygo2/api/regions/rnv/modules/stations/packages/1',
+			url: myUrl,
 			method: 'GET',
 			headers: { 'RNV_API_TOKEN': this.config.apiKey }
 		}, function (error, response, body) {
-			if (!error) {
+			
+			if (!error && response.statusCode == 200) {
 				self.sendSocketNotification("DATA", body);
 			}
 		});
