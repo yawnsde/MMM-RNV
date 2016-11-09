@@ -13,7 +13,7 @@ Module.register('MMM-RNV',{
 		apiKey: "",
 		units: config.units,
 		animationSpeed: 1000,
-		refreshInterval: 1000 * 60,
+		refreshInterval: 1000 * 60, //refresh every minute
 		updateInterval: 1000 * 3600, //update every hour
 		timeFormat: config.timeFormat,
 		lang: config.language,
@@ -23,7 +23,7 @@ Module.register('MMM-RNV',{
 
 		apiBase: 'http://rnv.the-agent-factory.de:8080/easygo2/api',		
 		requestURL: '/regions/rnv/modules/stationmonitor/element',
-		stationID: '5553',
+		stationID: '',
 		
 		iconTable: {
 			"KOM": "fa fa-bus",
@@ -50,7 +50,13 @@ Module.register('MMM-RNV',{
 		var wrapper = document.createElement("div");
 
 		if (this.config.apiKey === "") {
-			wrapper.innerHTML = "Please set the correct RNV <i>apiKey</i> in the config for module: " + this.name + ".";
+			wrapper.innerHTML = "No RNV <i>apiKey</i> set in config file.";
+			wrapper.className = "dimmed light small";
+			return wrapper;
+		}
+
+		if (this.config.stationID === "") {
+			wrapper.innerHTML = "No RNV <i>stationID</i> set in config file.";
 			wrapper.className = "dimmed light small";
 			return wrapper;
 		}
@@ -68,6 +74,7 @@ Module.register('MMM-RNV',{
 		}
 		
 		var table = document.createElement("table");
+		table.id = "rnvtable";
 		table.className = "small thin light";
 		
 		var row = document.createElement("tr");
@@ -118,6 +125,13 @@ Module.register('MMM-RNV',{
 		}
 		wrapper.appendChild(table);
 			
+		if (this.ticker) {
+			var marqueeTicker = document.createElement("marquee");
+			marqueeTicker.innerHTML = this.ticker;
+			marqueeTicker.className = "small thin light";
+			marqueeTicker.width = document.getElementsByClassName("module MMM-RNV MMM-RNV").offsetWidth;
+			wrapper.appendChild(marqueeTicker);
+		}
 
 		return wrapper;
 	},
@@ -128,9 +142,13 @@ Module.register('MMM-RNV',{
 		}
 		
 		this.departures = [];
-		
+		this.ticker = data.ticker;
+
 		for (var i in data.listOfDepartures) {
 			var t = data.listOfDepartures[i];
+			if ((t.time).indexOf(' ') > 0) { // time contains a date because it is not today
+				t.time = (t.time).substring((t.time).indexOf(' ')+1, (t.time).length);
+			}
 			this.departures.push({
 				time: (t.time).substring(0,5),
 				delay: (((t.time).indexOf('+') > 0) ? (t.time).substring(6,(t.time).length) : 0),
@@ -152,6 +170,7 @@ Module.register('MMM-RNV',{
 			}
 			else if (notification === "DATA") {
 				this.loaded = true;
+				Log.error(JSON.parse(payload));
 				this.processDepartures(JSON.parse(payload));
 				this.updateDom();
     		}
