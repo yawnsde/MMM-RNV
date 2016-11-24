@@ -74,13 +74,16 @@ Module.register('MMM-RNV',{
 
 		var timeHeader = document.createElement("th");
 		timeHeader.innerHTML = "Abfahrt";
+		timeHeader.className = "rnvheader";
 		row.appendChild(timeHeader);
 		var lineHeader = document.createElement("th");
 		lineHeader.innerHTML = "Linie";
+		lineHeader.className = "rnvheader";
 		lineHeader.colSpan = 2;
 		row.appendChild(lineHeader);
 		var destinationHeader = document.createElement("th");
 		destinationHeader.innerHTML = "Fahrtrichtung";
+		destinationHeader.className = "rnvheader";
 		row.appendChild(destinationHeader);		
 		table.appendChild(row);
 		
@@ -114,6 +117,7 @@ Module.register('MMM-RNV',{
 			
 			var cellDirection = document.createElement("td");
 			cellDirection.innerHTML = currentDeparture.direction;
+			cellDirection.className = "destinationinfo";
 			row.appendChild(cellDirection);			
 		}
 		wrapper.appendChild(table);
