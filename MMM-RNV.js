@@ -174,7 +174,6 @@ Module.register('MMM-RNV',{
 			}
 			else if (notification === "DATA") {
 				this.loaded = true;
-				Log.error(JSON.parse(payload));
 				this.processDepartures(JSON.parse(payload));
 				this.updateDom();
     		}
