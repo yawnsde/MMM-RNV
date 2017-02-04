@@ -133,7 +133,7 @@ Module.register('MMM-RNV',{
 			var marqueeTicker = document.createElement("marquee");
 			marqueeTicker.innerHTML = this.ticker;
 			marqueeTicker.className = "small thin light";
-			marqueeTicker.width = document.getElementsByClassName("module MMM-RNV MMM-RNV").offsetWidth;
+			marqueeTicker.width = document.getElementsByClassName("module MMM-RNV MMM-RNV")[0].offsetWidth;
 			wrapper.appendChild(marqueeTicker);
 		}
 
