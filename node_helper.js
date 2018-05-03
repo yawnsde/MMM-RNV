@@ -23,8 +23,8 @@ module.exports = NodeHelper.create({
 		
 		var currentDate = moment().format('YYYY-MM-DD+hh:mm:ss');
 		var myUrl = this.config.apiBase + this.config.requestURL + '?hafasID=' + this.config.stationID + '&time=' + currentDate;
-		if(this.config.poles != '') {
-			myUrl += '&poles=' + this.config.poles;
+		if(this.config.poleIDs != '') {
+			myUrl += '&poles=' + this.config.poleIDs;
 		}
 		
 		request({
