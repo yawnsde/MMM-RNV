@@ -25,6 +25,7 @@ Module.register('MMM-RNV',{
 		requestURL: '/regions/rnv/modules/stationmonitor/element',
 		stationID: '',
 		poleIDs: '',
+		walkingTimeOffset: 0,
 		
 		iconTable: {
 			"KOM": "fa fa-bus",
