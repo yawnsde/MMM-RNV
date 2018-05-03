@@ -24,7 +24,7 @@ Module.register('MMM-RNV',{
 		apiBase: 'http://rnv.the-agent-factory.de:8080/easygo2/api',		
 		requestURL: '/regions/rnv/modules/stationmonitor/element',
 		stationID: '',
-		poles: '',
+		poleIDs: '',
 		
 		iconTable: {
 			"KOM": "fa fa-bus",
