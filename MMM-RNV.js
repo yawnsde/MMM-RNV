@@ -156,13 +156,14 @@ Module.register('MMM-RNV',{
 			var departure = 0; // departure time of the transportation
 			var now = moment();
 
-			if((t.time).indexOf('+') > 0) { // if connection has a delay
+			if((t.time).includes('+')) { // if connection has a delay (could be 0 as well)
 				delay = (t.time).substring((t.time).indexOf('+') + 1, (t.time).length); // parse delay
 				t.time = (t.time).substring(0, (t.time).indexOf('+')); // cut off the delay
 			}
 
 			departure = moment(t.time, ["HH:mm", "DD.MM.YYYY HH:mm"]);
-			if(moment.duration(departure.add(delay, 'm').diff(now)).as('minutes') <= this.config.walkingTimeOffset) {
+			d1 = departure.clone(); // workaround because if-condition changes var departure (adds the delay) for unknown reason
+			if(moment.duration(d1.add(delay, 'm').diff(now)).as('minutes') <= this.config.walkingTimeOffset) {
 				continue; // skip this entry if transport is not reachable in time: (departure + delay - now) <= walkingTimeOffset)
 			}
 
