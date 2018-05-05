@@ -152,19 +152,30 @@ Module.register('MMM-RNV',{
 
 		for (var i in data.listOfDepartures) {
 			var t = data.listOfDepartures[i];
-			if ((t.time).indexOf(' ') > 0) { // time contains a date because it is not today
-				t.time = (t.time).substring((t.time).indexOf(' ')+1, (t.time).length);
+			var delay = 0; // delay of the trasportation
+			var departure = 0; // departure time of the transportation
+			var now = moment();
+
+			if((t.time).indexOf('+') > 0) { // if connection has a delay
+				delay = (t.time).substring((t.time).indexOf('+') + 1, (t.time).length); // parse delay
+				t.time = (t.time).substring(0, (t.time).indexOf('+')); // cut off the delay
 			}
+
+			departure = moment(t.time, ["HH:mm", "DD.MM.YYYY HH:mm"]);
+			if(moment.duration(departure.add(delay, 'm').diff(now)).as('minutes') <= this.config.walkingTimeOffset) {
+				continue; // skip this entry if transport is not reachable in time: (departure + delay - now) <= walkingTimeOffset)
+			}
+
 			this.departures.push({
-				time: (t.time).substring(0,5),
-				delay: (((t.time).indexOf('+') > 0) ? (t.time).substring(6,(t.time).length) : 0),
+				time: departure.format('HH:mm'),
+				delay: delay,
 				lineLabel: t.lineLabel,
 				direction: t.direction,
 				status: t.status,
 				statusNote: t.statusNote,
 				transportation: t.transportation,
 			});
-				
+
 		}
 		
 		return;
