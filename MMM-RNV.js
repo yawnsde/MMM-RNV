@@ -26,6 +26,7 @@ Module.register('MMM-RNV',{
 		stationID: '',
 		poleIDs: '',
 		walkingTimeOffset: 0,
+		numberOfShownDepartures: 10,
 		
 		iconTable: {
 			"KOM": "fa fa-bus",
@@ -149,8 +150,12 @@ Module.register('MMM-RNV',{
 		
 		this.departures = [];
 		this.ticker = data.ticker;
+		var iterations = 0;
 
 		for (var i in data.listOfDepartures) {
+			if(iterations == this.config.numberOfShownDepartures && this.config.numberOfShownDepartures > 0 && this.config.numberOfShownDepartures <= 10 ){
+				break;
+			}
 			var t = data.listOfDepartures[i];
 			var delay = 0; // delay of the trasportation
 			var departure = 0; // departure time of the transportation
@@ -176,7 +181,8 @@ Module.register('MMM-RNV',{
 				statusNote: t.statusNote,
 				transportation: t.transportation,
 			});
-
+			
+			iterations++;
 		}
 		
 		return;
