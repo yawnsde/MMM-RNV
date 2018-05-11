@@ -8,7 +8,7 @@
  */
 
 Module.register('MMM-RNV',{
-	
+
 	defaults: {
 		apiKey: "",
 		units: config.units,
@@ -21,24 +21,25 @@ Module.register('MMM-RNV',{
 		initialLoadDelay: 0, // 0 seconds delay
 		retryDelay: 2500,
 
-		apiBase: 'http://rnv.the-agent-factory.de:8080/easygo2/api',		
+		apiBase: 'http://rnv.the-agent-factory.de:8080/easygo2/api',
 		requestURL: '/regions/rnv/modules/stationmonitor/element',
 		stationID: '',
 		poleIDs: '',
 		walkingTimeOffset: 0,
 		numberOfShownDepartures: 10,
-		
+		showZeroDelay: false,
+
 		iconTable: {
 			"KOM": "fa fa-bus",
 			"STRAB": "fa fa-subway"
 		},
 	},
-	
+
 	// Define required scripts.
 	getScripts: function() {
 		return ["moment.js", "font-awesome.css"];
 	},
-	
+
 	getStyles: function() {
 		return ['MMM-RNV.css'];
 	},
@@ -68,18 +69,18 @@ Module.register('MMM-RNV',{
 			wrapper.innerHTML = this.translate('LOADING');
 			wrapper.className = "dimmed light small";
 			return wrapper;
-		}		
-		
+		}
+
 		if (!this.departures.length) {
 			wrapper.innerHTML = "No data";
 			wrapper.className = "dimmed light small";
 			return wrapper;
 		}
-		
+
 		var table = document.createElement("table");
 		table.id = "rnvtable";
 		table.className = "small thin light";
-		
+
 		var row = document.createElement("tr");
 
 		var timeHeader = document.createElement("th");
@@ -94,21 +95,27 @@ Module.register('MMM-RNV',{
 		var destinationHeader = document.createElement("th");
 		destinationHeader.innerHTML = "Fahrtrichtung";
 		destinationHeader.className = "rnvheader";
-		row.appendChild(destinationHeader);		
+		row.appendChild(destinationHeader);
 		table.appendChild(row);
-		
+
 		for (var i in this.departures) {
 			var currentDeparture = this.departures[i];
 			var row = document.createElement("tr");
 			table.appendChild(row);
-			
+
 			var cellDeparture = document.createElement("td");
 			cellDeparture.innerHTML = currentDeparture.time;
 			cellDeparture.className = "timeinfo";
+
 			if (currentDeparture.delay > 0) {
 				var spanDelay = document.createElement("span");
 				spanDelay.innerHTML = ' +' + currentDeparture.delay;
 				spanDelay.className = "small delay";
+				cellDeparture.appendChild(spanDelay);
+			} else if(currentDeparture.connectionIsLive && this.config.showZeroDelay) {
+				var spanDelay = document.createElement("span");
+				spanDelay.innerHTML = ' +' + currentDeparture.delay;
+				spanDelay.className = "small nodelay";
 				cellDeparture.appendChild(spanDelay);
 			}
 			row.appendChild(cellDeparture);
@@ -119,19 +126,19 @@ Module.register('MMM-RNV',{
 			symbolTransportation.className = this.config.iconTable[currentDeparture.transportation];
 			cellTransport.appendChild(symbolTransportation);
 			row.appendChild(cellTransport);
-			
+
 			var cellLine = document.createElement("td");
 			cellLine.innerHTML = currentDeparture.lineLabel;
 			cellLine.className = "lineinfo";
 			row.appendChild(cellLine);
-			
+
 			var cellDirection = document.createElement("td");
 			cellDirection.innerHTML = currentDeparture.direction;
 			cellDirection.className = "destinationinfo";
-			row.appendChild(cellDirection);			
+			row.appendChild(cellDirection);
 		}
 		wrapper.appendChild(table);
-			
+
 		if (this.ticker) {
 			var marqueeTicker = document.createElement("marquee");
 			marqueeTicker.innerHTML = this.ticker;
@@ -147,7 +154,7 @@ Module.register('MMM-RNV',{
 		if (!data.listOfDepartures) {
 			return;
 		}
-		
+
 		this.departures = [];
 		this.ticker = data.ticker;
 		var iterations = 0;
@@ -159,9 +166,11 @@ Module.register('MMM-RNV',{
 			var t = data.listOfDepartures[i];
 			var delay = 0; // delay of the trasportation
 			var departure = 0; // departure time of the transportation
+			var connectionIsLive = false;
 			var now = moment();
 
-			if((t.time).includes('+')) { // if connection has a delay (could be 0 as well)
+			if((t.time).includes('+')) { // if connection already started (showing delay, could be 0 as well)
+				connectionIsLive = true;
 				delay = (t.time).substring((t.time).indexOf('+') + 1, (t.time).length); // parse delay
 				t.time = (t.time).substring(0, (t.time).indexOf('+')); // cut off the delay
 			}
@@ -180,14 +189,15 @@ Module.register('MMM-RNV',{
 				status: t.status,
 				statusNote: t.statusNote,
 				transportation: t.transportation,
+				connectionIsLive: connectionIsLive,
 			});
-			
+
 			iterations++;
 		}
-		
+
 		return;
 	},
-	
+
  	socketNotificationReceived: function(notification, payload) {
     		if (notification === "STARTED") {
 				this.updateDom();
@@ -197,6 +207,6 @@ Module.register('MMM-RNV',{
 				this.processDepartures(JSON.parse(payload));
 				this.updateDom();
     		}
-	} 	
+	}
 
 });
