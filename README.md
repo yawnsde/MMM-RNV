@@ -35,3 +35,4 @@ The following properties can be configured:
 | `poleIDs` | String | The platform your transport leaves from. This can influence the direction shown. Get the different poles by executing `curl -H "RNV_API_TOKEN:<apiKey>" http://rnv.the-agent-factory.de:8080/easygo2/api/regions/rnv/modules/stations/detail?stationId=<stationID>`. To get the connections leaving from this pole, fire `curl -H "RNV_API_TOKEN:<apiKey>" http://rnv.the-agent-factory.de:8080/easygo2/api/regions/rnv/modules/stationmonitor/element?hafasID=<stationID>&time=null&poles=<poleIDs>`| '1', for multiple poles: '1;5;6' |
 | `walkingTimeOffset` | int | Time it takes you to reach your station in minutes. | 0 |
 | `numberOfShownDepartures` | int | Number of shown departures. Has to be between 1 and 10. | 10 |
+| `showZeroDelay` | bool | Shows delay for any connection which has already started even if 0. | false |
