@@ -21,9 +21,12 @@ module.exports = NodeHelper.create({
 	getData: function() {
 		var self = this;
 		
-		var currentDate = moment().format('YYYY-MM-DD+hh:mm:ss');
+		var currentDate = moment().add(this.config.walkingTimeOffset, 'm').format('YYYY-MM-DD+HH:mm:ss');
 		var myUrl = this.config.apiBase + this.config.requestURL + '?hafasID=' + this.config.stationID + '&time=' + currentDate;
-				
+		if(this.config.poleIDs != '') {
+			myUrl += '&poles=' + this.config.poleIDs;
+		}
+		
 		request({
 			url: myUrl,
 			method: 'GET',
